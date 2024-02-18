@@ -6,13 +6,13 @@ import { useRouter, usePathname } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
+import emailjs from "@emailjs/browser";
 
 const ParticipantEventRegisterPage = () => {
   const [pName, setPName] = useState("");
   const [pEmail, setPEmail] = useState("");
   const [pPhone, setPPhone] = useState("");
   const [pOrg, setPOrg] = useState("");
-  const [uniqueId, setUniqueId] = useState("");
 
   const router = useRouter();
 
@@ -22,6 +22,10 @@ const ParticipantEventRegisterPage = () => {
   const organization = parts[2];
   const uid = parts[3];
   const eventName = decodeURIComponent(parts[4]);
+
+  const serviceId = "service_hcds1on";
+  const templateId = "template_4lvc3gf";
+  const publicKey = "sWSGeQspNkkT6Ru87";
 
   const generateUniqueId = () => {
     return uuidv4();
@@ -46,13 +50,27 @@ const ParticipantEventRegisterPage = () => {
     );
 
     await addDoc(
-      collection(db, "participants", organization, uid, eventName, pEmail),
+      collection(db, "participantsQR", pEmail, organization, uid, eventName),
       {
         name: pName,
         email: pEmail,
         phone: pPhone,
         organization: pOrg,
         uniqueId: uniqueId,
+      }
+    );
+
+    var templateParams = {
+      code: uniqueId,
+      from_name: "Eve Manager",
+    };
+
+    emailjs.send(serviceId, templateId, templateParams, publicKey).then(
+      (response) => {
+        console.log("SUCCESS!", response.status, response.text);
+      },
+      (error) => {
+        console.log("FAILED...", error);
       }
     );
 

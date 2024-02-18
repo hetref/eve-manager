@@ -1,8 +1,15 @@
 "use client";
 
 import { auth, db } from "@/firebase";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
-import React, { useState } from "react";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+} from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaRegPlusSquare } from "react-icons/fa";
 import useAuthStore from "@/stores/useAuthStore";
@@ -12,11 +19,14 @@ import logo from "@/assets/logo/logo.png";
 import Link from "next/link";
 import { LuDot } from "react-icons/lu";
 
-const EventLayout = () => {
+const EventLayout = ({ eventNameParam }) => {
+  const [eventDataFetched, setEventDataFetched] = useState([]);
   const [featureImage, setFeatureImage] = useState([]);
   const [logoImage, setLogoImage] = useState([]);
-  const [eventName, setEventName] = useState("");
-  const [shortDescription, setShortDescription] = useState("");
+  const [eventName, setEventName] = useState(eventNameParam);
+  const [shortDescription, setShortDescription] = useState(
+    eventDataFetched[0]?.shortDescription
+  );
   const [deadlineDate, setDeadlineDate] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [aboutEvent, setAboutEvent] = useState("");
@@ -29,11 +39,37 @@ const EventLayout = () => {
     text: "",
     list: [],
   });
+
   const user = auth.currentUser;
 
   const router = useRouter();
 
   const orgDetails = useAuthStore((state) => state.orgDetails);
+
+  useEffect(() => {
+    const getAllEvents = async () => {
+      let items = [];
+      const docRef = doc(
+        db,
+        "events",
+        orgDetails.shortname,
+        user.uid,
+        eventName
+      );
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        items.push(docSnap.data());
+      } else {
+        // docSnap.data() will be undefined in this case
+        console.log("No such document!");
+      }
+      setEventDataFetched(items);
+    };
+
+    getAllEvents();
+  }, [orgDetails, user.uid, eventName]);
 
   const handleCreateEvent = () => {
     console.log("Create Event");
@@ -121,13 +157,18 @@ const EventLayout = () => {
             />
           </div>
           <div className={`w-[60%] flex flex-col px-6`}>
-            <input
+            {/* <input
               type="text"
               placeholder="Event Name ..."
               className="border-black/80 rounded border-2 px-6 py-2 mb-6"
               value={eventName}
               onChange={(e) => setEventName(e.target.value)}
-            />
+            /> */}
+
+            <span className="border-black/80 bg-black/10 font-bold text-black/70 rounded border-2 px-6 py-2 mb-6 w-full">
+              {eventName}
+            </span>
+
             <input
               type="text"
               placeholder="Short Description ..."

@@ -6,6 +6,8 @@ import EventLayout from "@/components/EventLayout";
 import useAuthStore from "@/stores/useAuthStore";
 import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { deleteDoc, doc } from "firebase/firestore";
+import { db } from "@/firebase";
 
 const EventPage = () => {
   const pathname = usePathname();
@@ -23,18 +25,46 @@ const EventPage = () => {
     console.log(eventName);
   }, [pathname, parts, userId, eventName]);
 
+  const deleteEventDB = async () => {
+    try {
+      // Delete event from database
+      await deleteDoc(
+        doc(db, "events", orgDetails.shortname, userId, eventName)
+      );
+      console.log("Deleting event from database...");
+      console.log("Deleted event from database successfully!");
+      alert("Event deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting event from database: ", error);
+    }
+  };
+
   return (
     <div className="flex justify-center items-center w-full">
       <div className="max-w-7xl w-full mt-10">
-        <Link
-          href={`http://localhost:3000/events/${orgDetails.shortname}/${userId}/${eventName}`}
-          className="flex items-center gap-4 text-[18px]"
-          target="_blank"
+        <div className="flex justify-between">
+          <Link
+            href={`http://localhost:3000/events/${orgDetails.shortname}/${userId}/${eventName}`}
+            className="flex items-center gap-4 text-[18px]"
+            target="_blank"
+          >
+            https://localhost:3000/events/{orgDetails.shortname}/{userId}/
+            {eventName} <FaExternalLinkAlt />
+          </Link>
+          <Link
+            href={`/dashboard/events/${userId}/${eventName}/analytics`}
+            className="bg-black/90 rounded text-white/90 hover:bg-black/80 hover:text-white px-6 py-2"
+          >
+            Analytics
+          </Link>
+        </div>
+        <EventLayout eventNameParam={eventName} />
+        <button
+          className="w-full bg-red-900 text-white py-4 text-xl mt-8 rounded"
+          onClick={deleteEventDB}
         >
-          https://localhost:3000/events/{orgDetails.shortname}/{userId}/
-          {eventName} <FaExternalLinkAlt />
-        </Link>
-        <EventLayout view={false} />
+          Delete Event
+        </button>
       </div>
     </div>
   );

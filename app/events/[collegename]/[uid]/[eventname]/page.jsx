@@ -1,6 +1,5 @@
 "use client";
 
-import EventLayout from "@/components/EventLayout";
 import { auth, db } from "@/firebase";
 import React, { useEffect, useState } from "react";
 import useAuthStore from "@/stores/useAuthStore";
@@ -10,6 +9,7 @@ import { LuDot } from "react-icons/lu";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/assets/logo/logo.png";
+// import { WhatsappShareButton, WhatsappIcon } from "next-share";
 
 const ParticipantEventPage = () => {
   const [eventsData, setEventsData] = useState([]);
@@ -116,6 +116,14 @@ const ParticipantEventPage = () => {
                       {eventName}/register
                     </Link>
                   </p>
+                  <div>
+                    Share on
+                    {/* <InstagramShareButton
+                      link={`http://localhost:3000/${pathname}`}
+                    >
+                      <InstagramIcon size={32} round />
+                    </InstagramShareButton> */}
+                  </div>
                 </div>
               </div>
 
