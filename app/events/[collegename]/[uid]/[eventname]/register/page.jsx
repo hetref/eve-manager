@@ -13,6 +13,9 @@ const ParticipantEventRegisterPage = () => {
   const [pEmail, setPEmail] = useState("");
   const [pPhone, setPPhone] = useState("");
   const [pOrg, setPOrg] = useState("");
+  const [otp, setOTP] = useState("");
+  const [verification, setVerification] = useState(false);
+  const [gOtp, setgOtp] = useState("");
 
   const router = useRouter();
 
@@ -63,6 +66,7 @@ const ParticipantEventRegisterPage = () => {
     var templateParams = {
       code: uniqueId,
       from_name: "Event Manager",
+      to_email: pEmail,
     };
 
     emailjs.send(serviceId, templateId, templateParams, publicKey).then(
@@ -124,6 +128,7 @@ const ParticipantEventRegisterPage = () => {
               <button
                 type="button"
                 className="ml-2 bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300"
+                onClick={handleSendOTP}
               >
                 Get OTP
               </button>
@@ -132,16 +137,19 @@ const ParticipantEventRegisterPage = () => {
               <label htmlFor="otp" className="block text-sm font-medium mr-2">
                 OTP
               </label>
+
               <input
                 type="text"
-                id="otp"
-                name="otp"
-                className="mt-1 p-2 flex-grow border border-gray-300 rounded-md"
                 placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOTP(e.target.value)}
+                className="mt-1 p-2 flex-grow border border-gray-300 rounded-md"
               />
+
               <button
                 type="button"
                 className="ml-2 bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300"
+                onClick={handleVerifyOTP}
               >
                 Verify OTP
               </button>

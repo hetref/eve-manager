@@ -6,8 +6,8 @@ import EventLayout from "@/components/EventLayout";
 import useAuthStore from "@/stores/useAuthStore";
 import Link from "next/link";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import { deleteDoc, doc } from "firebase/firestore";
-import { db } from "@/firebase";
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
+import { db, storage } from "@/firebase";
 
 const EventPage = () => {
   const pathname = usePathname();
@@ -17,6 +17,37 @@ const EventPage = () => {
   const orgDetails = useAuthStore((state) => state.orgDetails);
   const userId = parts[3];
   const eventName = decodeURIComponent(parts[4]);
+
+  const handleUploadFeaturedLogo = () => {
+    const uploadTask = storage.ref(`images/${image.name}`).put(image);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        console.log(snapshot);
+      },
+      (error) => {
+        console.error(error);
+      },
+      () => {
+        storage
+          .ref("images")
+          .child(image.name)
+          .getDownloadURL()
+          .then((url) => {
+            console.log("File available at", url);
+            // Add the URL to Firestore
+            // const docRef = doc(db, "your-collection", "your-document-id");
+            // setDoc(docRef, { imageUrl: url }, { merge: true })
+            //   .then(() => {
+            //     console.log("Document successfully updated with image URL");
+            //   })
+            //   .catch((error) => {
+            //     console.error("Error updating document: ", error);
+            //   });
+          });
+      }
+    );
+  };
 
   useEffect(() => {
     console.log(pathname);
