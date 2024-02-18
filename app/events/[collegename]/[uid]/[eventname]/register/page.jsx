@@ -62,7 +62,7 @@ const ParticipantEventRegisterPage = () => {
 
     var templateParams = {
       code: uniqueId,
-      from_name: "Eve Manager",
+      from_name: "Event Manager",
     };
 
     emailjs.send(serviceId, templateId, templateParams, publicKey).then(
