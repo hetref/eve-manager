@@ -1,44 +1,44 @@
 "use client";
+import { useState } from "react";
+import QRCode from "qrcode.react";
 
-import { db } from "@/firebase";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+function MyComponent() {
+  const [uniqueId, setUniqueId] = useState("");
+  const [qrGenerated, setQRGenerated] = useState(false);
+  const [qrId, setQrId] = useState("");
 
-const RegistrationSearchPage = () => {
-  const [emailInput, setEmailInput] = useState("");
-
-  const searchEmailInput = async (e) => {
-    e.preventDefault();
-    console.log("Search");
-    console.log(emailInput);
-
-    const docSnap = await getDocs(collection(db, "participantsQR"));
-    docSnap.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
-    });
-    // const docSnap = await getDoc(docRef);
-
-    // if (docSnap.exists()) {
-    //   console.log("Document data:", docSnap.data());
-    // } else {
-    //   console.log("No such document!");
-    // }
-  };
+  function handleCreateButtonClick() {
+    const id = qrId;
+    setUniqueId(id);
+    setQRGenerated(true);
+  }
 
   return (
-    <div>
-      <input
-        type="email"
-        placeholder="Enter Email"
-        value={emailInput}
-        onChange={(e) => setEmailInput(e.target.value)}
-      />
-
-      <div>
-        <button onClick={searchEmailInput}>Search</button>
-      </div>
+    <div className="container mx-auto my-8 p-8 bg-gray-100 rounded-lg">
+      {!qrGenerated && (
+        <div className="text-center">
+          <input
+            type="text"
+            value={qrId}
+            onChange={(e) => setQrId(e.target.value)}
+            className="border p-2 rounded-md"
+          />
+          <button
+            className="bg-black text-white rounded-md px-4 py-2 mt-2"
+            onClick={handleCreateButtonClick}
+          >
+            Create
+          </button>
+        </div>
+      )}
+      {uniqueId && qrGenerated && (
+        <div className="flex justify-center items-center flex-col gap-6 mt-4">
+          <p className="font-bold">Generated Unique ID: {uniqueId}</p>
+          <QRCode value={uniqueId} />
+        </div>
+      )}
     </div>
   );
-};
+}
 
-export default RegistrationSearchPage;
+export default MyComponent;
