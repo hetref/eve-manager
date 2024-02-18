@@ -9,6 +9,7 @@ import { LuDot } from "react-icons/lu";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/assets/logo/logo.png";
+import { RWebShare } from "react-web-share";
 // import { WhatsappShareButton, WhatsappIcon } from "next-share";
 
 const ParticipantEventPage = () => {
@@ -117,7 +118,16 @@ const ParticipantEventPage = () => {
                     </Link>
                   </p>
                   <div>
-                    Share on
+                    <RWebShare
+                      data={{
+                        text: "Eve Manager",
+                        url: `http://localhost:3000/events/${organization}/${uid}/${eventName}`,
+                        title: "GfG",
+                      }}
+                      onClick={() => console.log("shared successfully!")}
+                    >
+                      <button>Share on Web</button>
+                    </RWebShare>
                     {/* <InstagramShareButton
                       link={`http://localhost:3000/${pathname}`}
                     >

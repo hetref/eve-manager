@@ -26,9 +26,57 @@ const ParticipantEventRegisterPage = () => {
   const uid = parts[3];
   const eventName = decodeURIComponent(parts[4]);
 
-  const serviceId = "service_hcds1on";
-  const templateId = "template_4lvc3gf";
-  const publicKey = "sWSGeQspNkkT6Ru87";
+  const serviceId = "service_l61248r";
+  const templateId = "template_5ruyq9e";
+  const publicKey = "nIcAjnQR85lcKd5yD";
+
+  const generateRandom4DigitNumber = () => {
+    return Math.floor(Math.random() * 9000) + 1000;
+  };
+
+  const handleVerifyOTP = () => {
+    console.log(otp);
+    console.log(gOtp);
+    if (otp == gOtp) {
+      toast.success("Email verified successfully.");
+      setVerification(true);
+    } else {
+      toast.error("invalid OTP");
+      setVerification(false);
+    }
+    // setOTP("");
+  };
+
+  const handleSendOTP = async (e) => {
+    e.preventDefault();
+    console.log("clicked");
+
+    if (pEmail !== "") {
+      const otpnum = Math.floor(Math.random() * 9000) + 1000;
+      setgOtp(otpnum);
+
+      const template_params = {
+        from_name: "Eve Manager",
+        to_name: pName,
+        message: otpnum,
+        to_email: pEmail,
+      };
+
+      emailjs
+        .send(serviceId, templateId, template_params, publicKey)
+        .then((response) => {
+          console.log("Email Sent:" + { response });
+          toast.success("OTP sent to your email.");
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+
+      console.log("Loading");
+    } else {
+      window.alert("Field cannot be empty");
+    }
+  };
 
   const generateUniqueId = () => {
     return uuidv4();
@@ -36,6 +84,12 @@ const ParticipantEventRegisterPage = () => {
 
   const handleSubmitParticipate = async (e) => {
     e.preventDefault();
+
+    if (!verification) {
+      toast.error("Please verify your email.");
+      return;
+    }
+
     console.log(pName, pEmail, pPhone, pOrg);
 
     // Add the participant to the database with this collection structure
@@ -63,20 +117,22 @@ const ParticipantEventRegisterPage = () => {
       }
     );
 
-    var templateParams = {
-      code: uniqueId,
-      from_name: "Event Manager",
+    const template_params = {
+      from_name: "Eve Manager",
+      to_name: pName,
+      message: uniqueId,
       to_email: pEmail,
     };
 
-    emailjs.send(serviceId, templateId, templateParams, publicKey).then(
-      (response) => {
-        console.log("SUCCESS!", response.status, response.text);
-      },
-      (error) => {
-        console.log("FAILED...", error);
-      }
-    );
+    emailjs
+      .send(serviceId, templateId, template_params, publicKey)
+      .then((response) => {
+        console.log("Email Sent:" + { response });
+        toast.success("Registration ID sent to your email.");
+      })
+      .catch((e) => {
+        console.log(e);
+      });
 
     toast.success("You are registered for the event.");
     toast.success(
@@ -133,27 +189,29 @@ const ParticipantEventRegisterPage = () => {
                 Get OTP
               </button>
             </div>
-            <div className="mb-5">
-              <label htmlFor="otp" className="block text-sm font-medium mr-2">
-                OTP
-              </label>
+            {!verification && (
+              <div className="mb-5">
+                <label htmlFor="otp" className="block text-sm font-medium mr-2">
+                  OTP
+                </label>
 
-              <input
-                type="text"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={(e) => setOTP(e.target.value)}
-                className="mt-1 p-2 flex-grow border border-gray-300 rounded-md"
-              />
+                <input
+                  type="text"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOTP(e.target.value)}
+                  className="mt-1 p-2 flex-grow border border-gray-300 rounded-md"
+                />
 
-              <button
-                type="button"
-                className="ml-2 bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300"
-                onClick={handleVerifyOTP}
-              >
-                Verify OTP
-              </button>
-            </div>
+                <button
+                  type="button"
+                  className="ml-2 bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300"
+                  onClick={handleVerifyOTP}
+                >
+                  Verify OTP
+                </button>
+              </div>
+            )}
             <div className="mb-5">
               <label htmlFor="phone" className="block text-sm font-medium mr-2">
                 Phone No

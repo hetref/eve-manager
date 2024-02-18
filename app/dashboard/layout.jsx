@@ -3,7 +3,7 @@
 import { Sidebar } from "@/components/Sidebar";
 import { auth, db } from "@/firebase";
 import useAuthStore from "@/stores/useAuthStore";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import Link from "next/link";
 import { redirect, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ const Dashboard = ({ children }) => {
 
   const userStatus = useAuthStore((state) => state.userStatus);
   const setOrgDetails = useAuthStore((state) => state.setOrgDetails);
+  const orgDetails = useAuthStore((state) => state.orgDetails);
 
   const user = auth.currentUser;
 
@@ -37,6 +38,18 @@ const Dashboard = ({ children }) => {
   //     }
   //   });
   // };
+
+  const paybuttonHandle = async () => {
+    // Set the document
+    setDoc(doc(db, "organizations", user.uid), {
+      ...orgDetails,
+      paid: true,
+    }).then(() => {
+      console.log(user);
+      console.log("PUSHING to DASHBOARD");
+      router.push("/dashboard");
+    });
+  };
 
   useEffect(() => {
     const getPaidAndIsNew = async () => {
@@ -78,6 +91,7 @@ const Dashboard = ({ children }) => {
           {paid === false && (
             <div className="bg-red-500 text-white p-4">
               <h1>Your organization is not paid</h1>
+              <button onClick={paybuttonHandle}>Pay Now</button>
             </div>
           )}
           {paid === true && (
